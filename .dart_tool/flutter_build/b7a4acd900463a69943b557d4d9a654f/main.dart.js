@@ -40835,7 +40835,7 @@ case 11:s=12
 return A.G(B.bp.mP(0,"remember_me",B.ep.k(a0)),$async$oa)
 case 12:n.db.sn(0,j)
 n.ch.sn(0,!0)
-A.a4X($.aJ(),"/dashboard",t.z)
+A.a4X($.aJ(),"/",t.z)
 s=8
 break
 case 9:g=m

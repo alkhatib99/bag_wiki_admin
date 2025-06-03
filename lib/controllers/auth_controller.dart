@@ -8,21 +8,21 @@ import '../services/api_service.dart';
 class AuthController extends GetxController {
   final ApiService _apiService = Get.find<ApiService>();
   final storage = const FlutterSecureStorage();
-  
+
   final RxBool isLoggedIn = false.obs;
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
   final RxBool passwordVisible = false.obs;
-  
+
   // User data
   final Rx<Map<String, dynamic>> userData = Rx<Map<String, dynamic>>({});
-  
+
   @override
   void onInit() {
     super.onInit();
     checkLoginStatus();
   }
-  
+
   // Check if user is already logged in
   Future<void> checkLoginStatus() async {
     final token = await storage.read(key: 'jwt_token');
@@ -47,13 +47,13 @@ class AuthController extends GetxController {
       }
     }
   }
-  
+
   // Login function
   Future<void> login(String email, String password, bool rememberMe) async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      
+
       final response = await http.post(
         Uri.parse('${_apiService.baseUrl}/auth/login'),
         headers: {'Content-Type': 'application/json'},
@@ -62,25 +62,25 @@ class AuthController extends GetxController {
           'password': password,
         }),
       );
-      
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final token = data['token'];
         final user = data['user'];
-        
+
         // Store token and user data
         await storage.write(key: 'jwt_token', value: token);
         await storage.write(key: 'user_data', value: json.encode(user));
-        
+
         // Store remember me preference
         await storage.write(key: 'remember_me', value: rememberMe.toString());
-        
+
         // Update controller state
         userData.value = user;
         isLoggedIn.value = true;
-        
+
         // Navigate to dashboard
-        Get.offAllNamed('/dashboard');
+        Get.offAllNamed('/');
       } else {
         final data = json.decode(response.body);
         setErrorMessage(data['error'] ?? 'Login failed');
@@ -92,7 +92,7 @@ class AuthController extends GetxController {
       isLoading.value = false;
     }
   }
-  
+
   // Logout function
   Future<void> logout({bool showConfirmation = true}) async {
     if (showConfirmation) {
@@ -116,42 +116,42 @@ class AuthController extends GetxController {
           ],
         ),
       );
-      
+
       if (confirmed != true) return;
     }
-    
+
     // Check if "remember me" was enabled
     final rememberMe = await storage.read(key: 'remember_me');
-    
+
     // Clear storage
     await storage.delete(key: 'jwt_token');
     await storage.delete(key: 'user_data');
-    
+
     // Keep remember me preference if it was true
     if (rememberMe == 'true') {
       await storage.write(key: 'remember_me', value: 'true');
     } else {
       await storage.delete(key: 'remember_me');
     }
-    
+
     // Update controller state
     userData.value = {};
     isLoggedIn.value = false;
-    
+
     // Navigate to login
     Get.offAllNamed('/login');
   }
-  
+
   // Check if user has admin role
   bool isAdmin() {
     return userData.value['role'] == 'admin';
   }
-  
+
   // Check if user has viewer role
   bool isViewer() {
     return userData.value['role'] == 'viewer';
   }
-  
+
   // Set error message with auto-clear after 5 seconds
   void setErrorMessage(String message) {
     errorMessage.value = message;
@@ -161,7 +161,7 @@ class AuthController extends GetxController {
       }
     });
   }
-  
+
   // Toggle password visibility
   void togglePasswordVisibility() {
     passwordVisible.value = !passwordVisible.value;
