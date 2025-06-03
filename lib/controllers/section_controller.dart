@@ -11,6 +11,11 @@ class SectionController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isEditing = false.obs;
   final RxBool isDeleting = false.obs;
+  final RxString errorMessage = ''.obs;
+  final RxBool isCreating = false.obs;
+  final RxBool isUpdating = false.obs;
+  final RxBool isDeletingSection = false.obs;
+
 
   @override
   void onInit() {
@@ -106,5 +111,14 @@ class SectionController extends GetxController {
       icon: const Icon(Icons.error, color: Colors.white),
       duration: const Duration(seconds: 5),
     );
+  }
+
+  void setErrorMessage(String s) {
+    errorMessage.value = s;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (errorMessage.value == s) {
+        errorMessage.value = '';
+      }
+    }); 
   }
 }
