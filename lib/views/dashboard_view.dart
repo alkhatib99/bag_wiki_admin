@@ -10,15 +10,16 @@ class DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SectionController controller = Get.find<SectionController>();
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Image.network(
-              'https://dapp.bagguild.com/assets/logo.png',
+            Image.asset(
+              'assets/images/logo.png',
               height: 40,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 40),
+              // errorBuilder: (context, error, stackTrace) =>
+              // const Icon(Icons.image, size: 40),
             ),
             const SizedBox(width: 12),
             const Text('BAG Wiki Admin'),
@@ -51,7 +52,7 @@ class DashboardView extends StatelessWidget {
               ),
             );
           }
-          
+
           if (controller.sections.isEmpty) {
             return Center(
               child: Column(
@@ -85,7 +86,8 @@ class DashboardView extends StatelessWidget {
                     icon: const Icon(Icons.add),
                     label: const Text('Add Section'),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 16),
                       textStyle: const TextStyle(fontSize: 16),
                     ),
                   ),
@@ -93,7 +95,7 @@ class DashboardView extends StatelessWidget {
               ),
             );
           }
-          
+
           return Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -113,7 +115,8 @@ class DashboardView extends StatelessWidget {
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       child: ElevatedButton.icon(
-                        onPressed: () => _navigateToEditView(context, controller),
+                        onPressed: () =>
+                            _navigateToEditView(context, controller),
                         icon: const Icon(Icons.add),
                         label: const Text('Add Section'),
                         style: ElevatedButton.styleFrom(
@@ -160,7 +163,8 @@ class DashboardView extends StatelessWidget {
       ),
       itemCount: controller.sections.length,
       itemBuilder: (context, index) {
-        return _buildSectionCard(context, controller.sections[index], controller);
+        return _buildSectionCard(
+            context, controller.sections[index], controller);
       },
     );
   }
@@ -171,13 +175,15 @@ class DashboardView extends StatelessWidget {
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 24.0),
-          child: _buildSectionCard(context, controller.sections[index], controller),
+          child: _buildSectionCard(
+              context, controller.sections[index], controller),
         );
       },
     );
   }
 
-  Widget _buildSectionCard(BuildContext context, SectionModel section, SectionController controller) {
+  Widget _buildSectionCard(BuildContext context, SectionModel section,
+      SectionController controller) {
     return Hero(
       tag: 'section-${section.id}',
       child: Card(
@@ -225,7 +231,8 @@ class DashboardView extends StatelessWidget {
                           color: const Color(0xFF333333),
                           child: const Center(
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9353D3)),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF9353D3)),
                             ),
                           ),
                         );
@@ -237,7 +244,8 @@ class DashboardView extends StatelessWidget {
                     left: 0,
                     right: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -287,7 +295,8 @@ class DashboardView extends StatelessWidget {
                         tooltip: 'Edit Section',
                         onPressed: () {
                           controller.setSelectedSection(section);
-                          Get.to(() => EditSectionView(), transition: Transition.rightToLeft);
+                          Get.to(() => EditSectionView(),
+                              transition: Transition.rightToLeft);
                         },
                       ),
                       const SizedBox(width: 8),
@@ -295,7 +304,8 @@ class DashboardView extends StatelessWidget {
                         icon: Icons.delete,
                         color: Colors.red,
                         tooltip: 'Delete Section',
-                        onPressed: () => _showDeleteConfirmation(context, section, controller),
+                        onPressed: () => _showDeleteConfirmation(
+                            context, section, controller),
                       ),
                     ],
                   ),
@@ -339,7 +349,8 @@ class DashboardView extends StatelessWidget {
     Get.to(() => EditSectionView(), transition: Transition.rightToLeft);
   }
 
-  void _showDeleteConfirmation(BuildContext context, SectionModel section, SectionController controller) {
+  void _showDeleteConfirmation(BuildContext context, SectionModel section,
+      SectionController controller) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -369,7 +380,8 @@ class DashboardView extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.amber),
+                    const Icon(Icons.warning_amber_rounded,
+                        color: Colors.amber),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
