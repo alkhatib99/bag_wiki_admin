@@ -26,12 +26,12 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/splash', page: () => const SplashScreen()),
         GetPage(name: '/login', page: () => LoginView()),
         GetPage(
-          name: '/dashboard', 
+          name: '/dashboard',
           page: () => DashboardView(),
           transition: Transition.fadeIn,
         ),
         GetPage(
-          name: '/edit-section', 
+          name: '/edit-section',
           page: () => EditSectionView(),
           transition: Transition.rightToLeft,
         ),
@@ -46,8 +46,9 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     // Initialize API service
-    Get.put(ApiService(baseUrl: 'https://bag-wiki-api.onrender.com'), permanent: true);
-    
+    Get.put(ApiService(baseUrl: 'https://bag-wiki-api_dart.onrender.com'),
+        permanent: true);
+
     // Initialize controllers
     Get.put(AuthController(), permanent: true);
     Get.put(SectionController(), permanent: true);
@@ -61,36 +62,37 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<double> _scaleAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
-    
+
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
       ),
     );
-    
+
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
       ),
     );
-    
+
     _controller.forward();
-    
+
     // Check auth status after animation
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -98,18 +100,18 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       }
     });
   }
-  
+
   Future<void> _checkAuthStatus() async {
     final authController = Get.find<AuthController>();
     await authController.checkLoginStatus();
-    
+
     if (authController.isLoggedIn.value) {
       Get.offAllNamed('/dashboard');
     } else {
       Get.offAllNamed('/login');
     }
   }
-  
+
   @override
   void dispose() {
     _controller.dispose();
@@ -146,8 +148,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       ),
                       child: Image.network(
                         'https://dapp.bagguild.com/assets/images/logo.png',
-                        errorBuilder: (context, error, stackTrace) => 
-                            Icon(Icons.account_circle, size: 120, color: AppTheme.primaryPurple),
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.account_circle,
+                            size: 120,
+                            color: AppTheme.primaryPurple),
                       ),
                     ),
                     const SizedBox(height: 40),
