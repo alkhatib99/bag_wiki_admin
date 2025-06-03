@@ -4,7 +4,7 @@ import '../models/section_model.dart';
 
 class SectionService {
   // Production API endpoint for Render-deployed Dart backend
-  final String baseUrl = 'https://bag-wiki-api_dart.onrender.com/api/sections';
+  final String baseUrl = 'https://bag-wiki-api-dart.onrender.com/api/sections';
   
   Future<List<SectionModel>> getSections() async {
     try {

@@ -46,7 +46,7 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     // Initialize API service
-    Get.put(ApiService(baseUrl: 'https://bag-wiki-api_dart.onrender.com'),
+    Get.put(ApiService(baseUrl: 'https://bag-wiki-api-dart.onrender.com'),
         permanent: true);
 
     // Initialize controllers
