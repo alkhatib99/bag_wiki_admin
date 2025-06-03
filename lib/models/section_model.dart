@@ -3,12 +3,16 @@ class SectionModel {
   String title;
   String content;
   String imageUrl;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 
   SectionModel({
     this.id,
     required this.title,
     required this.content,
     required this.imageUrl,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory SectionModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +21,12 @@ class SectionModel {
       title: json['title'],
       content: json['content'],
       imageUrl: json['imageUrl'],
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'].toString())
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt'].toString())
+          : null,
     );
   }
 
@@ -26,6 +36,8 @@ class SectionModel {
       'title': title,
       'content': content,
       'imageUrl': imageUrl,
-    };
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    }..removeWhere((key, value) => value == null);
   }
 }

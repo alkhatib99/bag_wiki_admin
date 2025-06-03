@@ -5,19 +5,19 @@ import '../services/section_service.dart';
 
 class SectionController extends GetxController {
   final SectionService _sectionService = SectionService();
-  
+
   final RxList<SectionModel> sections = <SectionModel>[].obs;
   final Rx<SectionModel?> selectedSection = Rx<SectionModel?>(null);
   final RxBool isLoading = false.obs;
   final RxBool isEditing = false.obs;
   final RxBool isDeleting = false.obs;
-  
+
   @override
   void onInit() {
     super.onInit();
     fetchSections();
   }
-  
+
   Future<void> fetchSections() async {
     try {
       isLoading.value = true;
@@ -28,18 +28,7 @@ class SectionController extends GetxController {
       isLoading.value = false;
     }
   }
-  
-  Future<void> getSection(int id) async {
-    try {
-      isLoading.value = true;
-      selectedSection.value = await _sectionService.getSection(id);
-    } catch (e) {
-      _showErrorSnackbar('Failed to load section', e.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
-  
+
   Future<void> createSection(SectionModel section) async {
     try {
       isLoading.value = true;
@@ -53,7 +42,7 @@ class SectionController extends GetxController {
       isLoading.value = false;
     }
   }
-  
+
   Future<void> updateSection(SectionModel section) async {
     try {
       isLoading.value = true;
@@ -67,7 +56,7 @@ class SectionController extends GetxController {
       isLoading.value = false;
     }
   }
-  
+
   Future<void> deleteSection(int id) async {
     try {
       isDeleting.value = true;
@@ -80,17 +69,17 @@ class SectionController extends GetxController {
       isDeleting.value = false;
     }
   }
-  
+
   void setSelectedSection(SectionModel? section) {
     selectedSection.value = section;
     isEditing.value = section != null;
   }
-  
+
   void clearSelectedSection() {
     selectedSection.value = null;
     isEditing.value = false;
   }
-  
+
   void _showSuccessSnackbar(String title, String message) {
     Get.snackbar(
       title,
@@ -102,11 +91,9 @@ class SectionController extends GetxController {
       borderRadius: 8,
       icon: const Icon(Icons.check_circle, color: Colors.white),
       duration: const Duration(seconds: 3),
-      animationDuration: const Duration(milliseconds: 500),
-      forwardAnimationCurve: Curves.easeOutBack,
     );
   }
-  
+
   void _showErrorSnackbar(String title, String message) {
     Get.snackbar(
       title,
@@ -118,8 +105,6 @@ class SectionController extends GetxController {
       borderRadius: 8,
       icon: const Icon(Icons.error, color: Colors.white),
       duration: const Duration(seconds: 5),
-      animationDuration: const Duration(milliseconds: 500),
-      forwardAnimationCurve: Curves.easeOutBack,
     );
   }
 }
