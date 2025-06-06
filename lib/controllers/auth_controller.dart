@@ -18,13 +18,16 @@ class AuthController extends GetxController {
   final Rx<Map<String, dynamic>> userData = Rx<Map<String, dynamic>>({});
 
   @override
-  void onInit() {
+    onInit() async{
+      await     checkLoginStatus();
+
     super.onInit();
-    checkLoginStatus();
   }
 
   // Check if user is already logged in
-  Future<void> checkLoginStatus() async {
+   checkLoginStatus() async {
+     isLoading.value = true;
+      errorMessage.value = '';
     final token = await storage.read(key: 'jwt_token');
     if (token != null) {
       try {
@@ -32,20 +35,30 @@ class AuthController extends GetxController {
         final response = await _apiService.getSections();
         if (response.statusCode == 200) {
           // Token is valid, get user data from storage
+
           final userDataStr = await storage.read(key: 'user_data');
           if (userDataStr != null) {
             userData.value = json.decode(userDataStr);
             isLoggedIn.value = true;
+           isLoading.value = true;
+      errorMessage.value = '';
           }
         } else {
           // Token is invalid, clear storage
+          await storage.delete(key: 'jwt_token');
+          
           await logout(showConfirmation: false);
+         isLoading.value = true;
+      errorMessage.value = '';
         }
       } catch (e) {
         print('Error checking login status: $e');
         await logout(showConfirmation: false);
+       isLoading.value = true;
+      errorMessage.value = '';
       }
     }
+
   }
 
   // Login function
@@ -55,7 +68,7 @@ class AuthController extends GetxController {
       errorMessage.value = '';
 
       final response = await http.post(
-        Uri.parse('${_apiService.baseUrl}/auth/login'),
+        Uri.parse('${_apiService.baseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,
@@ -65,6 +78,7 @@ class AuthController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        
         final token = data['token'];
         final user = data['user'];
 

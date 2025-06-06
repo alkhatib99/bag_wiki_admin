@@ -21,21 +21,22 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'BAG Wiki Admin',
       theme: AppTheme.themeData,
-      initialRoute: '/splash',
-      getPages: [
-        GetPage(name: '/splash', page: () => const SplashScreen()),
-        GetPage(name: '/login', page: () => LoginView()),
-        GetPage(
-          name: '/dashboard',
-          page: () => DashboardView(),
-          transition: Transition.fadeIn,
-        ),
-        GetPage(
-          name: '/edit-section',
-          page: () => EditSectionView(),
-          transition: Transition.rightToLeft,
-        ),
-      ],
+      initialRoute: AppRoutes.splash,
+      getPages: AppRoutes.pages,
+      // [
+      //   GetPage(name: '/splash', page: () => const SplashScreen()),
+      //   GetPage(name: '/login', page: () => LoginView()),
+      //   GetPage(
+      //     name: '/dashboard',
+      //     page: () => DashboardView(),
+      //     transition: Transition.fadeIn,
+      //   ),
+      //   GetPage(
+      //     name: '/edit-section',
+      //     page: () => EditSectionView(),
+      //     transition: Transition.rightToLeft,
+      //   ),
+      // ],
       initialBinding: AppBindings(),
       debugShowCheckedModeBanner: false,
     );
@@ -46,7 +47,7 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     // Initialize API service
-    Get.put(ApiService(baseUrl: 'https://bag-wiki-api-dart.onrender.com'),
+    Get.put(ApiService(baseUrl: AppConstants.baseUrl),
         permanent: true);
 
     // Initialize controllers
@@ -106,7 +107,7 @@ class _SplashScreenState extends State<SplashScreen>
     await authController.checkLoginStatus();
 
     if (authController.isLoggedIn.value) {
-      Get.offAllNamed('/dashboard');
+      Get.toNamed('/dashboard');
     } else {
       Get.offAllNamed('/login');
     }
@@ -181,4 +182,39 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
+}
+
+class AppConstants {
+
+  static const String baseUrl = 'https://bag-wiki-api-dart.onrender.com';
+  static const String tokenKey = 'token';
+  static const String userKey = 'user';
+  static const String sectionKey = 'section';
+}
+
+class AppRoutes{
+
+  static const String splash = '/splash';
+  static const String login = '/login';
+  static const String dashboard = '/dashboard';
+
+  static const String editSection = '/edit-section';
+  static const String addSection = '/add-section';
+  static const String viewSection = '/view-section';
+
+
+   static List<GetPage> get pages =>  [
+        GetPage(name: '/splash', page: () => const SplashScreen()),
+        GetPage(name: '/login', page: () => LoginView()),
+        GetPage(
+          name: '/dashboard',
+          page: () => DashboardView(),
+          transition: Transition.fadeIn,
+        ),
+        GetPage(
+          name: '/edit-section',
+          page: () => EditSectionView(),
+          transition: Transition.rightToLeft,
+        ),
+      ];
 }
