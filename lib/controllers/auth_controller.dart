@@ -1,3 +1,4 @@
+import 'package:bag_wiki_admin/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -67,7 +68,7 @@ class AuthController extends GetxController {
       errorMessage.value = '';
       // the database store pasword hash
       // final response = await _apiService.login(email, password);
-      final response = await http.post(
+      var response = await http.post(
         Uri.parse('${_apiService.baseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
@@ -94,13 +95,13 @@ class AuthController extends GetxController {
         isLoggedIn.value = true;
 
         // Navigate to dashboard
-        Get.offAllNamed('/');
+        Get.toNamed(AppRoutes.dashboard);
       } else {
         final data = json.decode(response.body);
         setErrorMessage(data['error'] ?? 'Login failed');
       }
     } catch (e) {
-      setErrorMessage('Connection error. Please try again.');
+      setErrorMessage('Connection error. Please try again. $e');
       print('Login error: $e');
     } finally {
       isLoading.value = false;
