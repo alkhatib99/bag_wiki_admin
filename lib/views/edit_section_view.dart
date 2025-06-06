@@ -382,7 +382,7 @@ class EditSectionView extends StatelessWidget {
     if (isEditing.value) {
       sectionController.updateSection(section);
     } else {
-      sectionController.createSection(section);
+      // sectionController.createSection(section);
     }
   }
 }

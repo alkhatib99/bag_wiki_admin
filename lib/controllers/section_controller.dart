@@ -34,19 +34,19 @@ class SectionController extends GetxController {
     }
   }
 
-  Future<void> createSection(SectionModel section) async {
-    try {
-      isLoading.value = true;
-      await _sectionService.createSection(section);
-      await fetchSections();
-      Get.back();
-      _showSuccessSnackbar('Section created', 'The section has been created successfully.');
-    } catch (e) {
-      _showErrorSnackbar('Failed to create section', e.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
+  // Future<void> createSection(SectionModel section) async {
+  //   try {
+  //     isLoading.value = true;
+  //     await _sectionService.createSection(section);
+  //     await fetchSections();
+  //     Get.back();
+  //     _showSuccessSnackbar('Section created', 'The section has been created successfully.');
+  //   } catch (e) {
+  //     _showErrorSnackbar('Failed to create section', e.toString());
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
   Future<void> updateSection(SectionModel section) async {
     try {
