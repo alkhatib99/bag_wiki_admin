@@ -62,7 +62,30 @@ class SectionController extends GetxController {
       final response = await _apiService.updateSection(section);
       if (response.statusCode == 200) {
         await fetchSections();
-        Get.back();
+        _showSuccessSnackbar(
+            'Section updated', 'The section has been updated successfully.');
+      } else {
+        throw Exception('Failed to update section: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Failed to update section', e.toString());
+    } finally {
+      isUpdating.value = false;
+    }
+  }
+
+  // New method for in-place editing
+  Future<void> updateSectionInPlace(SectionModel section) async {
+    try {
+      isUpdating.value = true;
+      final response = await _apiService.updateSection(section);
+      if (response.statusCode == 200) {
+        // Update the section in the local list without refetching all sections
+        final index = sections.indexWhere((s) => s.id == section.id);
+        if (index != -1) {
+          sections[index] = section;
+          sections.refresh(); // Trigger UI update
+        }
         _showSuccessSnackbar(
             'Section updated', 'The section has been updated successfully.');
       } else {

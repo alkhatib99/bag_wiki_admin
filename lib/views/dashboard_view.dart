@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:bag_wiki_admin/models/section_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
@@ -8,7 +9,6 @@ import '../theme/app_theme.dart';
 import '../widgets/shared_button.dart';
 import '../widgets/section_card.dart';
 import '../widgets/confirm_dialog.dart';
-
 
 class DashboardView extends StatelessWidget {
   final AuthController authController = Get.find<AuthController>();
@@ -199,13 +199,16 @@ class DashboardView extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final section = sectionController.sections[index];
                     return SectionCard(
-                      section: section.toJson(),
+                      section: section,
                       onEdit: authController.isAdmin()
                           ? () =>
                               Get.toNamed('/edit-section', arguments: section)
                           : null,
                       onDelete: authController.isAdmin()
                           ? () => _confirmDelete(section.id ?? 0)
+                          : null,
+                      onSave: authController.isAdmin()
+                          ? (updatedSection) => _handleSectionUpdate(updatedSection)
                           : null,
                     );
                   },
@@ -216,6 +219,10 @@ class DashboardView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _handleSectionUpdate(SectionModel updatedSection) {
+    sectionController.updateSectionInPlace(updatedSection);
   }
 
   void _confirmDelete(int id) {
@@ -236,5 +243,4 @@ class DashboardView extends StatelessWidget {
     );
   }
 }
-
 
