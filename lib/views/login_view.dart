@@ -7,9 +7,28 @@ class LoginView extends StatelessWidget {
   final AuthController authController = Get.find<AuthController>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final RxBool rememberMe = false.obs;
 
-  LoginView({Key? key}) : super(key: key);
+  LoginView({Key? key}) : super(key: key) {
+    // Check for prefilled credentials from environment (optional)
+    _loadPrefillCredentials();
+  }
+
+  // Load prefilled credentials if available
+  void _loadPrefillCredentials() async {
+    // This could be extended to read from .env or .env.local files
+    // For now, we'll leave it empty but the structure is ready
+    // You can uncomment and modify the following lines if you have environment setup:
+    
+    // const adminEmail = String.fromEnvironment('ADMIN_EMAIL', defaultValue: '');
+    // const adminPassword = String.fromEnvironment('ADMIN_PASSWORD', defaultValue: '');
+    
+    // if (adminEmail.isNotEmpty) {
+    //   emailController.text = adminEmail;
+    // }
+    // if (adminPassword.isNotEmpty) {
+    //   passwordController.text = adminPassword;
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +38,8 @@ class LoginView extends StatelessWidget {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            // Add ConstrainedBox to limit the width on larger screens
             child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                  maxWidth: 450), // Max width for the form area
+              constraints: const BoxConstraints(maxWidth: 450),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,11 +59,10 @@ class LoginView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      // Use local asset for the logo
                       child: Image.asset(
-                        'assets/images/logo.png', // Load from local assets
+                        'assets/images/logo.png',
                         errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.account_circle,
+                            Icons.admin_panel_settings,
                             size: 120,
                             color: AppTheme.primaryPurple),
                       ),
@@ -72,7 +88,7 @@ class LoginView extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Login to manage content',
+                    'Admin Login',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -82,7 +98,7 @@ class LoginView extends StatelessWidget {
                   ),
                   const SizedBox(height: 50),
 
-                  // Login Form Container (already has padding)
+                  // Login Form Container
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -105,7 +121,7 @@ class LoginView extends StatelessWidget {
                       children: [
                         // Email Field
                         Text(
-                          'EMAIL',
+                          'ADMIN EMAIL',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -118,7 +134,7 @@ class LoginView extends StatelessWidget {
                           controller: emailController,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
-                            hintText: 'Enter your email',
+                            hintText: 'Enter admin email',
                             hintStyle: TextStyle(color: Colors.grey[600]),
                             filled: true,
                             fillColor: AppTheme.inputDark,
@@ -127,7 +143,7 @@ class LoginView extends StatelessWidget {
                               borderSide: BorderSide.none,
                             ),
                             prefixIcon: Icon(
-                              Icons.email_outlined,
+                              Icons.admin_panel_settings,
                               color: AppTheme.primaryPurple,
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -137,14 +153,27 @@ class LoginView extends StatelessWidget {
                                 width: 2,
                               ),
                             ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                color: Colors.red,
+                                width: 1,
+                              ),
+                            ),
                           ),
                           keyboardType: TextInputType.emailAddress,
+                          onChanged: (value) {
+                            // Clear error message when user starts typing
+                            if (authController.errorMessage.isNotEmpty) {
+                              authController.clearErrorMessage();
+                            }
+                          },
                         ),
                         const SizedBox(height: 24),
 
                         // Password Field
                         Text(
-                          'PASSWORD',
+                          'ADMIN PASSWORD',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -155,11 +184,10 @@ class LoginView extends StatelessWidget {
                         const SizedBox(height: 8),
                         Obx(() => TextField(
                               controller: passwordController,
-                              obscureText:
-                                  !authController.passwordVisible.value,
+                              obscureText: !authController.passwordVisible.value,
                               style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
-                                hintText: 'Enter your password',
+                                hintText: 'Enter admin password',
                                 hintStyle: TextStyle(color: Colors.grey[600]),
                                 filled: true,
                                 fillColor: AppTheme.inputDark,
@@ -188,31 +216,26 @@ class LoginView extends StatelessWidget {
                                     width: 2,
                                   ),
                                 ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
                               ),
+                              onChanged: (value) {
+                                // Clear error message when user starts typing
+                                if (authController.errorMessage.isNotEmpty) {
+                                  authController.clearErrorMessage();
+                                }
+                              },
+                              onSubmitted: (value) {
+                                // Allow login on Enter key press
+                                _handleLogin();
+                              },
                             )),
-                        const SizedBox(height: 16),
-
-                        // Remember Me Checkbox
-                        Row(
-                          children: [
-                            Obx(() => Checkbox(
-                                  value: rememberMe.value,
-                                  onChanged: (value) =>
-                                      rememberMe.value = value ?? false,
-                                  activeColor: AppTheme.primaryPurple,
-                                  checkColor: Colors.white,
-                                  side: BorderSide(color: Colors.grey[600]!),
-                                )),
-                            Text(
-                              'Remember me',
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 32),
 
                         // Login Button
                         Obx(() => ElevatedButton(
@@ -222,26 +245,39 @@ class LoginView extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.primaryPurple,
                                 foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 elevation: 5,
-                                shadowColor:
-                                    AppTheme.primaryPurple.withOpacity(0.5),
+                                shadowColor: AppTheme.primaryPurple.withOpacity(0.5),
+                                disabledBackgroundColor: Colors.grey[700],
                               ),
                               child: authController.isLoading.value
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
+                                  ? Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: const [
+                                        SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          'LOGGING IN...',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1,
+                                          ),
+                                        ),
+                                      ],
                                     )
                                   : const Text(
-                                      'LOGIN',
+                                      'LOGIN AS ADMIN',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -257,33 +293,85 @@ class LoginView extends StatelessWidget {
                   const SizedBox(height: 24),
                   Obx(() => authController.errorMessage.isNotEmpty
                       ? Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border:
-                                Border.all(color: Colors.red.withOpacity(0.3)),
+                            border: Border.all(color: Colors.red.withOpacity(0.3)),
                           ),
                           child: Row(
                             children: [
                               const Icon(
                                 Icons.error_outline,
                                 color: Colors.red,
+                                size: 24,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 12),
                               Expanded(
-                                child: Text(
-                                  authController.errorMessage.value,
-                                  style: const TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 14,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Login Failed',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      authController.errorMessage.value,
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => authController.clearErrorMessage(),
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                  size: 20,
                                 ),
                               ),
                             ],
                           ),
                         )
                       : const SizedBox.shrink()),
+
+                  // Info message for development
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: Colors.blue[300],
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Use the admin credentials configured in your backend environment.',
+                            style: TextStyle(
+                              color: Colors.blue[300],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -299,21 +387,22 @@ class LoginView extends StatelessWidget {
 
     // Basic validation
     if (email.isEmpty) {
-      authController.setErrorMessage('Email is required');
+      authController.setErrorMessage('Admin email is required');
       return;
     }
 
     if (!GetUtils.isEmail(email)) {
-      authController.setErrorMessage('Please enter a valid email');
+      authController.setErrorMessage('Please enter a valid email address');
       return;
     }
 
     if (password.isEmpty) {
-      authController.setErrorMessage('Password is required');
+      authController.setErrorMessage('Admin password is required');
       return;
     }
 
     // Attempt login
-    authController.login(email, password, rememberMe.value);
+    authController.login(email, password);
   }
 }
+

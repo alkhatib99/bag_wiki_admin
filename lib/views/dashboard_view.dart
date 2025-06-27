@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
@@ -50,16 +52,16 @@ class DashboardView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            authController.userData.value['username'] ?? 'User',
-                            style: const TextStyle(
+                          const Text(
+                            'User',
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppTheme.textLight,
                             ),
                           ),
-                          Text(
-                            authController.userData.value['email'] ?? '',
-                            style: const TextStyle(
+                          const Text(
+                            "email",
+                            style: TextStyle(
                               fontSize: 12,
                               color: AppTheme.textGrey,
                             ),
@@ -101,14 +103,13 @@ class DashboardView extends StatelessWidget {
                       ),
                     ),
                   ],
-                  child: CircleAvatar(
+                  child: const CircleAvatar(
                     backgroundColor: AppTheme.primaryPurple,
                     child: Text(
-                      authController.userData.value['username']
-                              ?.substring(0, 1)
-                              .toUpperCase() ??
-                          'U',
-                      style: const TextStyle(
+                      // authController.userData.value['username']
+                      "Admin", // Placeholder for username
+
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
