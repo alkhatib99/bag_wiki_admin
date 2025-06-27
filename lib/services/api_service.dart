@@ -6,19 +6,21 @@ import 'dart:convert';
 import '../models/section_model.dart';
 
 class ApiService extends GetxService {
-  final String baseUrl;
+  // Corrected base URL to point to the root of the API
+  final String baseUrl = 'https://bag-wiki-api-dart.onrender.com';
   final storage = const FlutterSecureStorage();
 
-  ApiService({required this.baseUrl});
+  ApiService();
 
   // Get JWT token from secure storage
   Future<String?> _getToken() async {
     return await storage.read(key: 'jwt_token');
   }
 
+  // Login function (already correctly implemented)
   login(String email, String password) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/login'),
+      Uri.parse('$baseUrl/auth/login'), // Corrected endpoint
       body: jsonEncode({'email': email, 'password': password}),
       headers: {'Content-Type': 'application/json'},
     );
@@ -29,12 +31,10 @@ class ApiService extends GetxService {
       await storage.write(key: 'jwt_token', value: token);
       return token;
     } else {
-      throw Exception('Login failed');
+      throw Exception(jsonDecode(response.body)['error'] ?? 'Login failed');
     }
   }
 
-  // Get all sections (with pagination)
-  // Future<Map
   // Add authorization header if token exists
   Future<Map<String, String>> _getHeaders() async {
     final token = await _getToken();
@@ -50,56 +50,88 @@ class ApiService extends GetxService {
   }
 
   // GET all sections
-  Future<http.Response> getSections() async {
+  Future<List<SectionModel>> getSections() async {
     final headers = await _getHeaders();
-    return http.get(
+    final response = await http.get(
       Uri.parse('$baseUrl/api/sections'),
       headers: headers,
     );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => SectionModel.fromJson(json)).toList();
+    } else if (response.statusCode == 401) {
+      handleUnauthorized();
+      throw Exception('Unauthorized: Session expired or invalid token');
+    } else {
+      throw Exception('Failed to load sections: ${response.statusCode} ${response.body}');
+    }
   }
 
   // GET section by ID
-  Future<http.Response> getSectionById(int id) async {
+  Future<SectionModel> getSectionById(int id) async {
     final headers = await _getHeaders();
-    return http.get(
+    final response = await http.get(
       Uri.parse('$baseUrl/api/sections/$id'),
       headers: headers,
     );
+
+    if (response.statusCode == 200) {
+      return SectionModel.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 401) {
+      handleUnauthorized();
+      throw Exception('Unauthorized: Session expired or invalid token');
+    } else {
+      throw Exception('Failed to load section: ${response.statusCode} ${response.body}');
+    }
   }
 
   // POST new section
   Future<http.Response> createSection(SectionModel section) async {
     final headers = await _getHeaders();
-    return http.post(
+    final response = await http.post(
       Uri.parse('$baseUrl/api/sections'),
       headers: headers,
       body: json.encode(section.toJson()),
     );
+    if (response.statusCode == 401) {
+      handleUnauthorized();
+    }
+    return response;
   }
 
   // PUT update section
   Future<http.Response> updateSection(SectionModel section) async {
     final headers = await _getHeaders();
-    return http.put(
+    final response = await http.put(
       Uri.parse('$baseUrl/api/sections/${section.id}'),
       headers: headers,
       body: json.encode(section.toJson()),
     );
+    if (response.statusCode == 401) {
+      handleUnauthorized();
+    }
+    return response;
   }
 
   // DELETE section
   Future<http.Response> deleteSection(int id) async {
     final headers = await _getHeaders();
-    return http.delete(
+    final response = await http.delete(
       Uri.parse('$baseUrl/api/sections/$id'),
       headers: headers,
     );
+    if (response.statusCode == 401) {
+      handleUnauthorized();
+    }
+    return response;
   }
 
   // Handle unauthorized responses (token expired)
   void handleUnauthorized() {
     // Clear token and redirect to login
     storage.delete(key: 'jwt_token');
+    storage.delete(key: 'admin_data'); // Clear admin data as well
     Get.offAllNamed('/login');
     Get.snackbar(
       'Session Expired',
@@ -111,3 +143,5 @@ class ApiService extends GetxService {
     );
   }
 }
+
+

@@ -9,6 +9,7 @@ import '../widgets/shared_button.dart';
 import '../widgets/section_card.dart';
 import '../widgets/confirm_dialog.dart';
 
+
 class DashboardView extends StatelessWidget {
   final AuthController authController = Get.find<AuthController>();
   final SectionController sectionController = Get.find<SectionController>();
@@ -36,7 +37,13 @@ class DashboardView extends StatelessWidget {
           ),
         ),
         actions: [
-          // User profile button
+          // Refresh Button
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () => sectionController.fetchSections(),
+            tooltip: 'Refresh Sections',
+          ),
+          // Admin profile button
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Obx(() => PopupMenuButton<String>(
@@ -52,18 +59,11 @@ class DashboardView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'User',
-                            style: TextStyle(
+                          Text(
+                            authController.getAdminEmail(),
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppTheme.textLight,
-                            ),
-                          ),
-                          const Text(
-                            "email",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.textGrey,
                             ),
                           ),
                           Container(
@@ -71,18 +71,14 @@ class DashboardView extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: authController.isAdmin()
-                                  ? AppTheme.primaryPurple.withOpacity(0.2)
-                                  : AppTheme.accentBlue.withOpacity(0.2),
+                              color: AppTheme.primaryPurple.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: Text(
-                              authController.isAdmin() ? 'Admin' : 'Viewer',
+                            child: const Text(
+                              'Admin',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: authController.isAdmin()
-                                    ? AppTheme.primaryPurple
-                                    : AppTheme.accentBlue,
+                                color: AppTheme.primaryPurple,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -103,13 +99,13 @@ class DashboardView extends StatelessWidget {
                       ),
                     ),
                   ],
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     backgroundColor: AppTheme.primaryPurple,
                     child: Text(
-                      // authController.userData.value['username']
-                      "Admin", // Placeholder for username
-
-                      style: TextStyle(
+                      authController.getAdminEmail().isNotEmpty
+                              ? authController.getAdminEmail()[0].toUpperCase()
+                              : 'A',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -240,3 +236,5 @@ class DashboardView extends StatelessWidget {
     );
   }
 }
+
+

@@ -1,10 +1,11 @@
+import 'package:bag_wiki_admin/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/section_model.dart';
 import '../services/section_service.dart';
 
 class SectionController extends GetxController {
-  final SectionService _sectionService = SectionService();
+  final ApiService _apiService = Get.find<ApiService>();
 
   final RxList<SectionModel> sections = <SectionModel>[].obs;
   final Rx<SectionModel?> selectedSection = Rx<SectionModel?>(null);
@@ -16,7 +17,6 @@ class SectionController extends GetxController {
   final RxBool isUpdating = false.obs;
   final RxBool isDeletingSection = false.obs;
 
-
   @override
   void onInit() {
     super.onInit();
@@ -26,52 +26,70 @@ class SectionController extends GetxController {
   Future<void> fetchSections() async {
     try {
       isLoading.value = true;
-      sections.value = await _sectionService.getSections();
+      errorMessage.value = '';
+      sections.value = await _apiService.getSections();
+      print('Sections loaded: ${sections.length}');
     } catch (e) {
+      print('Error fetching sections: $e');
       _showErrorSnackbar('Failed to load sections', e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Future<void> createSection(SectionModel section) async {
-  //   try {
-  //     isLoading.value = true;
-  //     await _sectionService.createSection(section);
-  //     await fetchSections();
-  //     Get.back();
-  //     _showSuccessSnackbar('Section created', 'The section has been created successfully.');
-  //   } catch (e) {
-  //     _showErrorSnackbar('Failed to create section', e.toString());
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
+  Future<void> createSection(SectionModel section) async {
+    try {
+      isCreating.value = true;
+      final response = await _apiService.createSection(section);
+      if (response.statusCode == 201) {
+        await fetchSections();
+        Get.back();
+        _showSuccessSnackbar(
+            'Section created', 'The section has been created successfully.');
+      } else {
+        throw Exception('Failed to create section: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showErrorSnackbar('Failed to create section', e.toString());
+    } finally {
+      isCreating.value = false;
+    }
+  }
 
   Future<void> updateSection(SectionModel section) async {
     try {
-      isLoading.value = true;
-      await _sectionService.updateSection(section);
-      await fetchSections();
-      Get.back();
-      _showSuccessSnackbar('Section updated', 'The section has been updated successfully.');
+      isUpdating.value = true;
+      final response = await _apiService.updateSection(section);
+      if (response.statusCode == 200) {
+        await fetchSections();
+        Get.back();
+        _showSuccessSnackbar(
+            'Section updated', 'The section has been updated successfully.');
+      } else {
+        throw Exception('Failed to update section: ${response.statusCode}');
+      }
     } catch (e) {
       _showErrorSnackbar('Failed to update section', e.toString());
     } finally {
-      isLoading.value = false;
+      isUpdating.value = false;
     }
   }
 
   Future<void> deleteSection(int id) async {
     try {
-      isDeleting.value = true;
-      await _sectionService.deleteSection(id);
-      await fetchSections();
-      _showSuccessSnackbar('Section deleted', 'The section has been deleted successfully.');
+      isDeletingSection.value = true;
+      final response = await _apiService.deleteSection(id);
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        await fetchSections();
+        _showSuccessSnackbar(
+            'Section deleted', 'The section has been deleted successfully.');
+      } else {
+        throw Exception('Failed to delete section: ${response.statusCode}');
+      }
     } catch (e) {
       _showErrorSnackbar('Failed to delete section', e.toString());
     } finally {
-      isDeleting.value = false;
+      isDeletingSection.value = false;
     }
   }
 
@@ -119,6 +137,6 @@ class SectionController extends GetxController {
       if (errorMessage.value == s) {
         errorMessage.value = '';
       }
-    }); 
+    });
   }
 }

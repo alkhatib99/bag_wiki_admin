@@ -33,24 +33,31 @@ class AuthController extends GetxController {
       final token = await storage.read(key: 'jwt_token');
       if (token != null) {
         // Validate token by making a request to the API
-        final response = await _apiService.getSections();
-        if (response.statusCode == 200) {
-          // Token is valid, get admin data from storage
-          final adminDataStr = await storage.read(key: 'admin_data');
-          if (adminDataStr != null) {
-            adminData.value = json.decode(adminDataStr);
-            isLoggedIn.value = true;
-          } else {
-            // Token exists but no admin data, logout
-            await logout(showConfirmation: false);
+        // If getSections throws an error (e.g., 401), it will be caught
+        await _apiService.getSections(); // Just call to validate token
+        
+        // If getSections succeeds, token is valid
+        final adminDataStr = await storage.read(key: 'admin_data');
+        if (adminDataStr != null) {
+          adminData.value = json.decode(adminDataStr);
+          isLoggedIn.value = true;
+          // Navigate to dashboard if not already there
+          if (Get.currentRoute != AppRoutes.dashboard) {
+            Get.offAllNamed(AppRoutes.dashboard);
           }
         } else {
-          // Token is invalid, clear storage
+          // Token exists but no admin data, logout
           await logout(showConfirmation: false);
+        }
+      } else {
+        // No token, ensure we are on login page
+        if (Get.currentRoute != AppRoutes.login) {
+          Get.offAllNamed(AppRoutes.login);
         }
       }
     } catch (e) {
       print('Error checking login status: $e');
+      // If token validation fails, logout
       await logout(showConfirmation: false);
     } finally {
       isLoading.value = false;
@@ -64,7 +71,7 @@ class AuthController extends GetxController {
       errorMessage.value = '';
 
       var response = await http.post(
-        Uri.parse('${_apiService.baseUrl}/api/auth/login'),
+        Uri.parse('${_apiService.baseUrl}/auth/login'), // Corrected endpoint
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,
@@ -193,4 +200,5 @@ class AuthController extends GetxController {
     errorMessage.value = '';
   }
 }
+
 

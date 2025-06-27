@@ -23,20 +23,6 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.themeData,
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
-      // [
-      //   GetPage(name: '/splash', page: () => const SplashScreen()),
-      //   GetPage(name: '/login', page: () => LoginView()),
-      //   GetPage(
-      //     name: '/dashboard',
-      //     page: () => DashboardView(),
-      //     transition: Transition.fadeIn,
-      //   ),
-      //   GetPage(
-      //     name: '/edit-section',
-      //     page: () => EditSectionView(),
-      //     transition: Transition.rightToLeft,
-      //   ),
-      // ],
       initialBinding: AppBindings(),
       debugShowCheckedModeBanner: false,
     );
@@ -47,8 +33,7 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     // Initialize API service
-    Get.put(ApiService(baseUrl: AppConstants.baseUrl),
-        permanent: true);
+    Get.put(ApiService(), permanent: true);
 
     // Initialize controllers
     Get.put(AuthController(), permanent: true);
@@ -107,9 +92,9 @@ class _SplashScreenState extends State<SplashScreen>
     await authController.checkLoginStatus();
 
     if (authController.isLoggedIn.value) {
-      Get.toNamed('/dashboard');
+      Get.offAllNamed(AppRoutes.dashboard);
     } else {
-      Get.offAllNamed('/login');
+      Get.offAllNamed(AppRoutes.login);
     }
   }
 
@@ -150,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Image.network(
                         'https://dapp.bagguild.com/assets/images/logo.png',
                         errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.account_circle,
+                            Icons.admin_panel_settings,
                             size: 120,
                             color: AppTheme.primaryPurple),
                       ),
@@ -185,36 +170,33 @@ class _SplashScreenState extends State<SplashScreen>
 }
 
 class AppConstants {
-
   static const String baseUrl = 'https://bag-wiki-api-dart.onrender.com';
   static const String tokenKey = 'token';
   static const String userKey = 'user';
   static const String sectionKey = 'section';
 }
 
-class AppRoutes{
-
+class AppRoutes {
   static const String splash = '/splash';
   static const String login = '/login';
   static const String dashboard = '/dashboard';
-
   static const String editSection = '/edit-section';
   static const String addSection = '/add-section';
   static const String viewSection = '/view-section';
 
-
-   static List<GetPage> get pages =>  [
-        GetPage(name: '/splash', page: () => const SplashScreen()),
-        GetPage(name: '/login', page: () => LoginView()),
+  static List<GetPage> get pages => [
+        GetPage(name: splash, page: () => const SplashScreen()),
+        GetPage(name: login, page: () => LoginView()),
         GetPage(
-          name: '/dashboard',
+          name: dashboard,
           page: () => DashboardView(),
           transition: Transition.fadeIn,
         ),
         GetPage(
-          name: '/edit-section',
+          name: editSection,
           page: () => EditSectionView(),
           transition: Transition.rightToLeft,
         ),
       ];
 }
+
