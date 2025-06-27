@@ -41238,7 +41238,7 @@ while(true)switch(s){case 0:s=3
 return A.F(p.pb(),$async$j0)
 case 3:o=c
 s=4
-return A.F(A.aTD(A.eR(u.Z+A.k(a.a),0,null),B.be.jY(A.aOB(a)),o),$async$j0)
+return A.F(A.aTD(A.eR(u.Z+A.k(a.a)+"/update",0,null),B.be.jY(A.aOB(a)),o),$async$j0)
 case 4:n=c
 if(n.b===401)p.GL()
 q=n
