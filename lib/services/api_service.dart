@@ -64,7 +64,8 @@ class ApiService extends GetxService {
       handleUnauthorized();
       throw Exception('Unauthorized: Session expired or invalid token');
     } else {
-      throw Exception('Failed to load sections: ${response.statusCode} ${response.body}');
+      throw Exception(
+          'Failed to load sections: ${response.statusCode} ${response.body}');
     }
   }
 
@@ -82,7 +83,8 @@ class ApiService extends GetxService {
       handleUnauthorized();
       throw Exception('Unauthorized: Session expired or invalid token');
     } else {
-      throw Exception('Failed to load section: ${response.statusCode} ${response.body}');
+      throw Exception(
+          'Failed to load section: ${response.statusCode} ${response.body}');
     }
   }
 
@@ -90,7 +92,7 @@ class ApiService extends GetxService {
   Future<http.Response> createSection(SectionModel section) async {
     final headers = await _getHeaders();
     final response = await http.post(
-      Uri.parse('$baseUrl/api/sections'),
+      Uri.parse('$baseUrl/api/sections/create'),
       headers: headers,
       body: json.encode(section.toJson()),
     );
@@ -100,11 +102,11 @@ class ApiService extends GetxService {
     return response;
   }
 
-  // PUT update section
+  // PUT update section - Fixed to use correct endpoint
   Future<http.Response> updateSection(SectionModel section) async {
     final headers = await _getHeaders();
     final response = await http.put(
-      Uri.parse('$baseUrl/api/sections/${section.id}'),
+      Uri.parse('$baseUrl/api/sections/${section.id}/update'), // Fixed endpoint
       headers: headers,
       body: json.encode(section.toJson()),
     );
@@ -143,5 +145,3 @@ class ApiService extends GetxService {
     );
   }
 }
-
-
